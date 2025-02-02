@@ -1,6 +1,7 @@
 plugins {
     kotlin("jvm") version "2.1.20-Beta2"
     id("com.github.johnrengelman.shadow") version "8.1.1"
+    kotlin("plugin.serialization") version "2.1.10"
 }
 
 group = "net.crystopia"
@@ -14,6 +15,7 @@ repositories {
 }
 
 dependencies {
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.0")
     compileOnly("net.md-5:bungeecord-api:1.21-R0.1-SNAPSHOT")
 }
 

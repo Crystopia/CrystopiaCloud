@@ -21,7 +21,7 @@ class SeverManager {
             val uuid = UUID.randomUUID().toString()
 
             ConfigManager.settings.servers[serverName] = ServerData(
-                name=uuid,
+                name=serverName,
                 uuid=uuid,
                 ip=host,
                 port=port,

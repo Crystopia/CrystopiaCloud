@@ -1,0 +1,11 @@
+{
+  "id": "crystopiacloud",
+  "name": "CrystopiaCloud",
+  "version": "1.21",
+  "description": "Our Cloud Plugin to manage our Server",
+  "authors": [
+    "jesforge"
+  ],
+  "dependencies": [],
+  "main": "net.crystopia.crystopiacloud.CrystopiaCloud"
+}

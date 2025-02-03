@@ -1,4 +1,4 @@
-package net.crystopia.crystopiaBCloud.config
+package net.crystopia.crystopiacloud.config
 
 interface Configurable {
     fun save()

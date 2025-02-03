@@ -1,1 +1,1 @@
-rootProject.name = "CrystopiaBCloud"
+rootProject.name = "CrystopiaCloud"

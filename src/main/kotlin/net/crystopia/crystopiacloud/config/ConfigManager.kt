@@ -1,11 +1,11 @@
-package net.crystopia.crystopiaBCloud.config
+package net.crystopia.crystopiacloud.config
 
-import net.crystopia.crystopiaBCloud.config.data.SettingsData
+import net.crystopia.crystopiacloud.config.data.SettingsData
 import java.io.File
 
 object ConfigManager {
 
-    private val settingsFile = File("plugins/CrystopiaBCloud/config.json")
+    private val settingsFile = File("plugins/CrystopiaCloud/config.json")
 
     val settings = settingsFile.loadConfig(SettingsData())
 

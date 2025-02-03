@@ -9,17 +9,17 @@ version = "0.1.0"
 
 repositories {
     mavenCentral()
-    maven( "https://libraries.minecraft.net")
-    maven("https://oss.sonatype.org/content/repositories/snapshots")
+    maven("https://libraries.minecraft.net")
+    maven {
+        name = "papermc"
+        url = uri("https://repo.papermc.io/repository/maven-public/")
+    }
 }
 
 dependencies {
-    compileOnly("net.md-5", "bungeecord-api", "1.21-R0.1-SNAPSHOT")
-    implementation("net.kyori", "adventure-text-minimessage", "4.17.0")
+    compileOnly("com.velocitypowered:velocity-api:3.4.0-SNAPSHOT")
+    annotationProcessor("com.velocitypowered:velocity-api:3.4.0-SNAPSHOT")
     implementation("net.kyori", "adventure-api", "4.17.0")
-    implementation("net.kyori" ,"adventure-platform-bungeecord" , "4.3.4")
-    implementation("net.kyori", "adventure-text-serializer-gson", "4.17.0")
-    compileOnly("com.mojang","brigadier","1.2.9")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.0")
 }
 

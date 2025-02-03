@@ -1,6 +1,5 @@
-package net.crystopia.crystopiaBCloud.config
+package net.crystopia.crystopiacloud.config
 
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import java.io.File
 

@@ -10,6 +10,7 @@ import net.kyori.adventure.resource.ResourcePackInfo
 import net.kyori.adventure.resource.ResourcePackRequest
 import net.kyori.adventure.text.minimessage.MiniMessage
 import java.net.URI
+import java.util.UUID
 
 class JoinEvent {
 
@@ -18,15 +19,22 @@ class JoinEvent {
     fun onPlayerLogin(event: ServerPostConnectEvent) {
         try {
             val mainPackUri = URI.create(ConfigManager.settings.mainPack)
-            val mainPackInfo =
-                ResourcePackInfo.resourcePackInfo().uri(mainPackUri).hash("0147ab35e1646d6551f6497675e3002cb355283f")
-                    .build()
+            val id: UUID = UUID.fromString(ConfigManager.settings.defaultRPId)
+
+            val mainPackInfo: ResourcePackInfo =
+                ResourcePackInfo.resourcePackInfo().uri(mainPackUri).hash("").id(id).build()
 
             val player = event.player
             val request = ResourcePackRequest.resourcePackRequest().packs(mainPackInfo)
                 .prompt(ResourcepackMessages().mainResourcePackRequest).required(true).build()
 
-            player.sendResourcePacks(request)
+            val alreadyApplied = player.appliedResourcePacks?.any { it.id == mainPackInfo.id() } ?: false
+
+            if (alreadyApplied) {
+
+            } else {
+                player.sendResourcePacks(request)
+            }
         } catch (e: Exception) {
             println("ERROR: ${e.message}")
         }

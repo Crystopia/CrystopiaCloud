@@ -5,6 +5,7 @@ import com.velocitypowered.api.proxy.ProxyServer
 import net.crystopia.crystopiacloud.functions.ServerManager
 import net.crystopia.crystopiacloud.mesages.CloudCommandMessages
 import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.format.NamedTextColor
 
 class CloudCommand(private val proxy: ProxyServer) : SimpleCommand {
 
@@ -19,7 +20,7 @@ class CloudCommand(private val proxy: ProxyServer) : SimpleCommand {
         when (args[0].lowercase()) {
             "add" -> {
                 if (args.size < 4) {
-                    source.source().sendMessage(Component.text("§cBenutzung: /cloud add <Name> <Host> <Port>"))
+                    source.source().sendMessage(CloudCommandMessages().defaultCloudCommand)
                     return
                 }
 
@@ -28,21 +29,21 @@ class CloudCommand(private val proxy: ProxyServer) : SimpleCommand {
                 val port = args[3].toIntOrNull()
 
                 if (port == null) {
-                    source.source().sendMessage(Component.text("§cUngültiger Port!"))
+                    source.source().sendMessage(Component.text("§cPort is required!", NamedTextColor.RED))
                     return
                 }
 
                 val request = ServerManager().addServer(name, host, port)
 
                 if (request) {
-                    source.source().sendMessage(Component.text("§aServer $name erfolgreich hinzugefügt!"))
+                    source.source().sendMessage(CloudCommandMessages().addServerSuccess(name))
                 } else {
-                    source.source().sendMessage(Component.text("§cFehler beim Hinzufügen des Servers."))
+                    source.source().sendMessage(CloudCommandMessages().addServerFailure)
                 }
             }
 
             else -> {
-                source.source().sendMessage(Component.text("§cUnbekannter Befehl. Nutze /cloud für Hilfe."))
+                source.source().sendMessage(Component.text("§cUse /cloud for help!"))
             }
         }
     }

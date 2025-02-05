@@ -14,7 +14,7 @@ class ServerManager {
         val proxy = CrystopiaCloud.instance.server!!
 
         if (proxy.getServer(serverName).isPresent) {
-            println("Server $serverName existiert bereits.")
+            println("Server $serverName is already in use")
             return false
         }
 
@@ -31,7 +31,7 @@ class ServerManager {
         )
         ConfigManager.save()
 
-        println("Server $serverName erfolgreich registriert!")
+        println("Server $serverName has been added!")
         return true
     }
 
@@ -40,7 +40,7 @@ class ServerManager {
 
         val serverOptional = proxy.getServer(serverName)
         if (!serverOptional.isPresent) {
-            println("Server $serverName existiert nicht.")
+            println("Server $serverName is not present in use")
             return false
         }
 
@@ -48,7 +48,7 @@ class ServerManager {
         ConfigManager.save()
 
         proxy.unregisterServer(serverOptional.get().serverInfo)
-        println("Server $serverName erfolgreich entfernt.")
+        println("Server $serverName has been removed!")
         return true
     }
 }

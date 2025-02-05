@@ -21,6 +21,15 @@ dependencies {
     annotationProcessor("com.velocitypowered:velocity-api:3.4.0-SNAPSHOT")
     implementation("net.kyori", "adventure-api", "4.17.0")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.0")
+    implementation("com.squareup.okhttp3:okhttp:4.11.0")
+
+    // Ktor
+    implementation("io.ktor:ktor-server-core:2.3.0")
+    implementation("io.ktor:ktor-server-netty:2.3.0")
+    implementation("io.ktor:ktor-server-content-negotiation:2.3.0")
+    implementation("io.ktor:ktor-serialization-kotlinx-json:2.3.0")
+    implementation("io.ktor:ktor-server-content-negotiation:2.x.x")
+    implementation("io.ktor:ktor-serialization-kotlinx-json:2.x.x")
 }
 
 java {

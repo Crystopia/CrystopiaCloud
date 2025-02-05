@@ -8,8 +8,11 @@ import com.velocitypowered.api.plugin.Plugin
 import com.velocitypowered.api.proxy.ProxyServer
 import net.crystopia.crystopiacloud.commands.CloudCommand
 import net.crystopia.crystopiacloud.commands.ResourcePackCommand
+import net.crystopia.crystopiacloud.config.ConfigManager
 import net.crystopia.crystopiacloud.events.JoinEvent
 import net.crystopia.crystopiacloud.events.ResourcePackEvent
+import net.crystopia.crystopiacloud.functions.ServerManager
+import net.crystopia.crystopiacloud.webapi.WebAPI
 import org.slf4j.Logger
 
 
@@ -48,6 +51,16 @@ class CrystopiaCloud {
         )
         server!!.eventManager.register(this, JoinEvent());
         server!!.eventManager.register(this, ResourcePackEvent());
+
+        registerServersOnStart()
+        WebAPI().main()
     }
 
+
+    fun registerServersOnStart() {
+        val servers = ConfigManager.settings.servers.filter { it.value.enabled }
+        servers.forEach { server ->
+            ServerManager().addServer(server.value.name.toString(), server.value.ip, server.value.port)
+        }
+    }
 }

@@ -50,9 +50,9 @@ class ResourcePackCommand : SimpleCommand {
                 val request = zipResourcepack(ConfigManager.settings.api!!.zipMainPack)
 
                 if (request != false) {
-
+                    source.sendMessage(ResourcepackMessages().zipPackFail)
                 } else {
-
+                    source.sendMessage(ResourcepackMessages().zipMainPackSucces)
                 }
             }
 
@@ -60,9 +60,9 @@ class ResourcePackCommand : SimpleCommand {
                 val request = zipResourcepack(ConfigManager.settings.api!!.zipDevPack)
 
                 if (request != false) {
-
+                    source.sendMessage(ResourcepackMessages().zipPackFail)
                 } else {
-
+                    source.sendMessage(ResourcepackMessages().zipDevPackSucces)
                 }
             }
 
@@ -82,6 +82,7 @@ class ResourcePackCommand : SimpleCommand {
                     .prompt(ResourcepackMessages().mainResourcePackRequest).required(true).build()
 
                 player.sendResourcePacks(request)
+                player.sendMessage(ResourcepackMessages().applyPackMessage)
             }
 
             "applyMainPack" -> {
@@ -100,6 +101,7 @@ class ResourcePackCommand : SimpleCommand {
                     .prompt(ResourcepackMessages().mainResourcePackRequest).required(true).build()
 
                 player.sendResourcePacks(request)
+                player.sendMessage(ResourcepackMessages().applyPackMessage)
             }
 
             else -> {

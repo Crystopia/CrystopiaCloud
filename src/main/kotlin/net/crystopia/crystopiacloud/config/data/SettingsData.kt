@@ -16,12 +16,11 @@ data class SettingsData(
 data class APIData(
     var apiToken: String = "",
     var APIPort: Int = 9900,
-    var productionURL: String = "",
+    var baseDaemonAPIURL: String = "",
+    var copyToProductionURL: String = "",
     var applyToOtherServerURL: String = "",
-    var productionPath: String = "",
-    var productionFileName: String = "",
-    var zipMainPack: String = "",
-    var zipDevPack: String = "",
+    var zipMainPackURL: String = "",
+    var zipDevPackURL: String = "",
 )
 
 @Serializable

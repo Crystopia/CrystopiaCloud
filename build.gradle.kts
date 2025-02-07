@@ -14,6 +14,9 @@ repositories {
         name = "papermc"
         url = uri("https://repo.papermc.io/repository/maven-public/")
     }
+    maven {
+        url = uri("https://s01.oss.sonatype.org/content/repositories/snapshots")
+    }
 }
 
 dependencies {
@@ -22,6 +25,11 @@ dependencies {
     implementation("net.kyori", "adventure-api", "4.17.0")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.0")
     implementation("com.squareup.okhttp3:okhttp:4.11.0")
+
+    // Command API
+    implementation("dev.jorel:commandapi-velocity-shade:9.7.1-SNAPSHOT")
+    implementation("dev.jorel:commandapi-bukkit-kotlin:9.7.0")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib")
 
     // Ktor
     implementation("io.ktor:ktor-server-core:2.3.0")

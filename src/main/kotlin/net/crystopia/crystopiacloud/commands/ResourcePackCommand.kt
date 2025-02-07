@@ -1,6 +1,9 @@
 package net.crystopia.crystopiacloud.commands
 
 import com.velocitypowered.api.command.SimpleCommand
+import dev.jorel.commandapi.executors.CommandExecutor
+import dev.jorel.commandapi.kotlindsl.commandTree
+import dev.jorel.commandapi.kotlindsl.literalArgument
 import net.crystopia.crystopiacloud.config.ConfigManager
 import net.crystopia.crystopiacloud.functions.applyToOtherServer
 import net.crystopia.crystopiacloud.functions.getProductionResourcepack
@@ -12,62 +15,60 @@ import net.kyori.adventure.text.Component
 import java.net.URI
 import java.util.UUID
 
-class ResourcePackCommand : SimpleCommand {
+class ResourcePackCommand {
 
-    override fun execute(invocation: SimpleCommand.Invocation) {
-        val source = invocation.source()
-        val args = invocation.arguments()
+    val command = commandTree("resourcepack") {
+        executes(CommandExecutor { commandSource, commandArguments ->
+            commandSource.sendMessage(ResourcepackMessages().defaultResourcepackCommandMessage)
+        })
+        literalArgument("copyToProduction") {
+            executes(CommandExecutor { commandSource, commandArguments ->
 
-        if (args.isEmpty()) {
-            source.sendMessage(Component.text("§cPlease use a correct Option!"))
-            return
-        }
-
-        when (args[0]) {
-            "copyToProduction" -> {
-
-                val request = getProductionResourcepack(ConfigManager.settings.api!!.productionURL)
+                val request = getProductionResourcepack(ConfigManager.settings.api!!.copyToProductionURL)
 
                 if (request != false) {
-                    source.sendMessage(ResourcepackMessages().productionPackFail)
+                    commandSource.sendMessage(ResourcepackMessages().productionPackFail)
                 } else {
-                    source.sendMessage(ResourcepackMessages().productionPackSuccess)
+                    commandSource.sendMessage(ResourcepackMessages().productionPackSuccess)
                 }
-
-            }
-
-            "applyToOtherServer" -> {
+            })
+        }
+        literalArgument("applyToOtherServer") {
+            executes(CommandExecutor { commandSource, commandArguments ->
                 val request = applyToOtherServer(ConfigManager.settings.api!!.applyToOtherServerURL)
 
                 if (request != false) {
-
+                    commandSource.sendMessage(ResourcepackMessages().applyToOtherServerFail)
                 } else {
-
+                    commandSource.sendMessage(ResourcepackMessages().applyToOtherServerSuccess)
                 }
-            }
-
-            "zipMainPack" -> {
-                val request = zipResourcepack(ConfigManager.settings.api!!.zipMainPack)
+            })
+        }
+        literalArgument("zipMainPack") {
+            executes(CommandExecutor { commandSource, commandArguments ->
+                val request = zipResourcepack(ConfigManager.settings.api!!.zipMainPackURL)
 
                 if (request != false) {
-                    source.sendMessage(ResourcepackMessages().zipPackFail)
+                    commandSource.sendMessage(ResourcepackMessages().zipPackFail)
                 } else {
-                    source.sendMessage(ResourcepackMessages().zipMainPackSucces)
+                    commandSource.sendMessage(ResourcepackMessages().zipMainPackSucces)
                 }
-            }
-
-            "zipDevPack" -> {
-                val request = zipResourcepack(ConfigManager.settings.api!!.zipDevPack)
+            })
+        }
+        literalArgument("zipDevPack") {
+            executes(CommandExecutor { commandSource, commandArguments ->
+                val request = zipResourcepack(ConfigManager.settings.api!!.zipDevPackURL)
 
                 if (request != false) {
-                    source.sendMessage(ResourcepackMessages().zipPackFail)
+                    commandSource.sendMessage(ResourcepackMessages().zipPackFail)
                 } else {
-                    source.sendMessage(ResourcepackMessages().zipDevPackSucces)
+                    commandSource.sendMessage(ResourcepackMessages().zipDevPackSucces)
                 }
-            }
-
-            "applyDevPack" -> {
-                source.removeResourcePacks(UUID.fromString(ConfigManager.settings.defaultRPId))
+            })
+        }
+        literalArgument("applyDevPack") {
+            executes(CommandExecutor { commandSource, commandArguments ->
+                commandSource.removeResourcePacks(UUID.fromString(ConfigManager.settings.defaultRPId))
 
                 val mainPackUri = URI.create(ConfigManager.settings.devPack)
                 val id: UUID = UUID.fromString(ConfigManager.settings.defaultRPId)
@@ -77,16 +78,17 @@ class ResourcePackCommand : SimpleCommand {
                         .id(id)
                         .build()
 
-                val player = source
+                val player = commandSource
                 val request = ResourcePackRequest.resourcePackRequest().packs(mainPackInfo)
                     .prompt(ResourcepackMessages().mainResourcePackRequest).required(true).build()
 
                 player.sendResourcePacks(request)
                 player.sendMessage(ResourcepackMessages().applyPackMessage)
-            }
-
-            "applyMainPack" -> {
-                source.removeResourcePacks(UUID.fromString(ConfigManager.settings.defaultRPId))
+            })
+        }
+        literalArgument("applyMainPack") {
+            executes(CommandExecutor { commandSource, commandArguments ->
+                commandSource.removeResourcePacks(UUID.fromString(ConfigManager.settings.defaultRPId))
 
                 val mainPackUri = URI.create(ConfigManager.settings.mainPack)
                 val id: UUID = UUID.fromString(ConfigManager.settings.defaultRPId)
@@ -96,21 +98,13 @@ class ResourcePackCommand : SimpleCommand {
                         .id(id)
                         .build()
 
-                val player = source
+                val player = commandSource
                 val request = ResourcePackRequest.resourcePackRequest().packs(mainPackInfo)
                     .prompt(ResourcepackMessages().mainResourcePackRequest).required(true).build()
 
                 player.sendResourcePacks(request)
                 player.sendMessage(ResourcepackMessages().applyPackMessage)
-            }
-
-            else -> {
-                source.sendMessage(Component.text("§cPlease use a correct Option!"))
-            }
+            })
         }
-    }
-
-    override fun suggest(invocation: SimpleCommand.Invocation): List<String> {
-        return listOf("copyToProduction", "applyToOtherServer", "applyDevPack", "applyMainPack", "zipMainPack", "zipDevPack")
     }
 }

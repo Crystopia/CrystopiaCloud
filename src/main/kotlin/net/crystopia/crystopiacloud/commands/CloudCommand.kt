@@ -1,54 +1,319 @@
 package net.crystopia.crystopiacloud.commands
 
-import com.velocitypowered.api.command.SimpleCommand
-import com.velocitypowered.api.proxy.ProxyServer
+import dev.jorel.commandapi.CommandTree
+import dev.jorel.commandapi.executors.CommandExecutor
+import dev.jorel.commandapi.kotlindsl.*
+import net.crystopia.crystopiacloud.config.ConfigManager
+import net.crystopia.crystopiacloud.config.data.ServerData
 import net.crystopia.crystopiacloud.functions.ServerManager
 import net.crystopia.crystopiacloud.mesages.CloudCommandMessages
 import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.format.NamedTextColor
+import okhttp3.Headers
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.RequestBody
 
-class CloudCommand(private val proxy: ProxyServer) : SimpleCommand {
+class CloudCommand {
 
-    override fun execute(source: SimpleCommand.Invocation) {
-        val args = source.arguments()
+    val command = commandTree("cloud") {
+        withPermission("crystopia.command.cloud")
+        executes(CommandExecutor { commandSource, commandArguments ->
+            commandSource.sendMessage(CloudCommandMessages().defaultCloudCommand)
+        })
+        literalArgument("register") {
+            stringArgument("name") {
+                executes(CommandExecutor { commandSource, commandArguments ->
 
-        if (args.isEmpty()) {
-            source.source().sendMessage(CloudCommandMessages().defaultCloudCommand)
-            return
-        }
+                    val name = commandArguments[0].toString()
+                    val host = ConfigManager.settings.servers[name]!!.ip
+                    val port = ConfigManager.settings.servers[name]!!.port
 
-        when (args[0].lowercase()) {
-            "add" -> {
-                if (args.size < 4) {
-                    source.source().sendMessage(CloudCommandMessages().defaultCloudCommand)
-                    return
-                }
+                    val request = ServerManager().registerServer(name, host, port)
 
-                val name = args[1]
-                val host = args[2]
-                val port = args[3].toIntOrNull()
-
-                if (port == null) {
-                    source.source().sendMessage(Component.text("§cPort is required!", NamedTextColor.RED))
-                    return
-                }
-
-                val request = ServerManager().addServer(name, host, port)
-
-                if (request) {
-                    source.source().sendMessage(CloudCommandMessages().addServerSuccess(name))
-                } else {
-                    source.source().sendMessage(CloudCommandMessages().addServerFailure)
-                }
-            }
-
-            else -> {
-                source.source().sendMessage(Component.text("§cUse /cloud for help!"))
+                    if (request) {
+                        commandSource.sendMessage(CloudCommandMessages().serverRegisterSuccess)
+                    } else {
+                        commandSource.sendMessage(CloudCommandMessages().serverRegisterFailure)
+                    }
+                })
             }
         }
-    }
+        literalArgument("unregister") {
+            stringArgument("name") {
+                executes(CommandExecutor { commandSource, commandArguments ->
 
-    override fun suggest(source: SimpleCommand.Invocation): List<String> {
-        return listOf("add", "remove", "list")
+                    val name = commandArguments[0].toString()
+
+                    val request = ServerManager().unregisterServer(name)
+
+                    if (request) {
+                        commandSource.sendMessage(CloudCommandMessages().serverUnregisterSuccess)
+                    } else {
+                        commandSource.sendMessage(CloudCommandMessages().serverUnregisterFailure)
+                    }
+                })
+            }
+        }
+        literalArgument("create") {
+            stringArgument("name") {
+                stringArgument("hostAddress") {
+                    integerArgument("port") {
+                        textArgument("serverOptions") {
+                            stringArgument("templateName") {
+                                executes(CommandExecutor { commandSource, commandArguments ->
+
+                                    val name = commandArguments[0].toString()
+                                    val host = commandArguments[1].toString()
+                                    val port = commandArguments[2].toString().toInt()
+                                    val serverOptions = commandArguments[3].toString()
+                                    val templateName = commandArguments[4].toString()
+
+                                    val servermanager = ServerManager().addServer(name, host, port)
+
+                                    if (servermanager == false) {
+                                        commandSource.sendMessage(CloudCommandMessages().serverCreateRegisterError)
+                                        return@CommandExecutor
+                                    }
+
+                                    val client = OkHttpClient()
+
+                                    val json = """{
+                                    "Name": "${name}",
+                                    "Host": "$host",
+                                    "Port": $port,
+                                    "ServerOptions": "$serverOptions",
+                                    "TemplateName": "$templateName"
+                                    }""".trimMargin()
+
+                                    val requestBody = RequestBody.create("application/json".toMediaTypeOrNull(), json)
+                                    val requestHeader =
+                                        Headers.Builder().set("Authorization", ConfigManager.settings.api.apiToken)
+                                            .build()
+
+
+                                    val request = Request.Builder()
+                                        .url(ConfigManager.settings.api.baseDaemonAPIURL + "/createServer")
+                                        .post(requestBody).headers(requestHeader).build()
+
+                                    client.newCall(request).execute().use { response ->
+
+                                        if (!response.isSuccessful) {
+                                            commandSource.sendMessage(CloudCommandMessages().serverCreateAPIError)
+                                            return@CommandExecutor
+                                        }
+
+                                        commandSource.sendMessage(CloudCommandMessages().serverCreateSuccess(name))
+                                    }
+                                })
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        literalArgument("start") {
+            stringArgument("name") {
+
+                executes(CommandExecutor { commandSource, commandArguments ->
+
+                    val name = commandArguments[0].toString()
+                    val host = ConfigManager.settings.servers[name]!!.ip
+
+                    val client = OkHttpClient()
+
+                    val json = """{
+                                    "Name": "$name",
+                                    "Host": "$host"
+                                    }""".trimMargin()
+
+                    val requestBody = RequestBody.create("application/json".toMediaTypeOrNull(), json)
+                    val requestHeader =
+                        Headers.Builder().set("Authorization", ConfigManager.settings.api.apiToken).build()
+
+
+                    val request = Request.Builder().url(ConfigManager.settings.api.baseDaemonAPIURL + "/startServer")
+                        .post(requestBody).headers(requestHeader).build()
+
+                    client.newCall(request).execute().use { response ->
+
+                        if (!response.isSuccessful) {
+                            commandSource.sendMessage(CloudCommandMessages().serverStartFail)
+                            return@CommandExecutor
+                        }
+
+                        commandSource.sendMessage(CloudCommandMessages().serverStartSuccess)
+                    }
+                })
+            }
+        }
+        literalArgument("stop") {
+            stringArgument("name") {
+
+                executes(CommandExecutor { commandSource, commandArguments ->
+
+                    val name = commandArguments[0].toString()
+                    val host = ConfigManager.settings.servers[name]!!.ip
+
+                    val client = OkHttpClient()
+
+                    val json = """{
+                                    "Name": "$name",
+                                    "Host": "$host"
+                                    }""".trimMargin()
+
+                    val requestBody = RequestBody.create("application/json".toMediaTypeOrNull(), json)
+                    val requestHeader =
+                        Headers.Builder().set("Authorization", ConfigManager.settings.api.apiToken).build()
+
+
+                    val request = Request.Builder().url(ConfigManager.settings.api.baseDaemonAPIURL + "/stopServer")
+                        .post(requestBody).headers(requestHeader).build()
+
+                    client.newCall(request).execute().use { response ->
+
+                        if (!response.isSuccessful) {
+                            commandSource.sendMessage(CloudCommandMessages().serverStopFail)
+                            return@CommandExecutor
+                        }
+
+                        commandSource.sendMessage(CloudCommandMessages().serverStopSuccess)
+                    }
+                })
+            }
+        }
+        literalArgument("restart") {
+            stringArgument("name") {
+
+                executes(CommandExecutor { commandSource, commandArguments ->
+
+                    val name = commandArguments[0].toString()
+                    val host = ConfigManager.settings.servers[name]!!.ip
+
+                    val client = OkHttpClient()
+
+                    val json = """{
+                                    "Name": "$name",
+                                    "Host": "$host"
+                                    }""".trimMargin()
+
+                    val requestBody = RequestBody.create("application/json".toMediaTypeOrNull(), json)
+                    val requestHeader =
+                        Headers.Builder().set("Authorization", ConfigManager.settings.api.apiToken).build()
+
+
+                    val request = Request.Builder().url(ConfigManager.settings.api.baseDaemonAPIURL + "/startServer")
+                        .post(requestBody).headers(requestHeader).build()
+                    val request2 = Request.Builder().url(ConfigManager.settings.api.baseDaemonAPIURL + "/stopServer")
+                        .post(requestBody).headers(requestHeader).build()
+
+                    client.newCall(request).execute().use { response ->
+
+                        if (!response.isSuccessful) {
+                            commandSource.sendMessage(CloudCommandMessages().serverStopFail)
+                            return@CommandExecutor
+                        }
+                        commandSource.sendMessage(CloudCommandMessages().serverStopSuccess)
+                        commandSource.sendMessage(CloudCommandMessages().addServerSuccess(name))
+                        client.newCall(request2).execute().use { response ->
+
+                            if (!response.isSuccessful) {
+                                commandSource.sendMessage(CloudCommandMessages().serverStartFail)
+                                return@CommandExecutor
+                            }
+                            commandSource.sendMessage(CloudCommandMessages().serverStartSuccess)
+                        }
+                    }
+
+
+                })
+            }
+        }
+        literalArgument("delete") {
+            stringArgument("name") {
+                stringArgument("delete? - type Force", optional = true) {
+                    executes(CommandExecutor { commandSource, commandArguments ->
+
+                        val name = commandArguments[0].toString()
+                        val force = commandArguments[1].toString()
+                        val host = ConfigManager.settings.servers[name]!!.ip
+
+                        val client = OkHttpClient()
+
+                        val json = """{
+                                    "Name": "$name",
+                                    "Host": "$host",
+                                    "Action": "$force"
+                                    }""".trimMargin()
+
+                        val requestBody = RequestBody.create("application/json".toMediaTypeOrNull(), json)
+                        val requestHeader =
+                            Headers.Builder().set("Authorization", ConfigManager.settings.api.apiToken).build()
+
+                        val request =
+                            Request.Builder().url(ConfigManager.settings.api.baseDaemonAPIURL + "/deleteServer")
+                                .post(requestBody).headers(requestHeader).build()
+
+                        client.newCall(request).execute().use { response ->
+
+                            if (!response.isSuccessful) {
+                                commandSource.sendMessage(CloudCommandMessages().serverDeleteFail)
+                                return@CommandExecutor
+                            }
+
+                            ConfigManager.settings.servers.remove(name)
+                            commandSource.sendMessage(CloudCommandMessages().serverDeleteSuccess)
+                        }
+                    })
+                }
+            }
+        }
+        literalArgument("update") {
+            stringArgument("name") {
+                textArgument("serverOptions") {
+                    integerArgument("port", optional = true) {
+                        executes(CommandExecutor { commandSource, commandArguments ->
+
+                            val name = commandArguments[0].toString()
+                            val host = ConfigManager.settings.servers[name]!!.ip
+                            val serverOptions = commandArguments[1].toString()
+                            var port = commandArguments[2].toString().toInt()
+
+                            if (port == null) {
+                                port = ConfigManager.settings.servers[name]!!.port
+                            }
+
+                            val client = OkHttpClient()
+
+                            val json = """{
+                                    "Name": "${name}",
+                                    "Host": "$host",
+                                    "Port": $port,
+                                    "ServerOptions": "$serverOptions"
+                                    }""".trimMargin()
+
+                            val requestBody = RequestBody.create("application/json".toMediaTypeOrNull(), json)
+                            val requestHeader =
+                                Headers.Builder().set("Authorization", ConfigManager.settings.api.apiToken).build()
+
+
+                            val request =
+                                Request.Builder().url(ConfigManager.settings.api.baseDaemonAPIURL + "/updateServer")
+                                    .post(requestBody).headers(requestHeader).build()
+
+                            client.newCall(request).execute().use { response ->
+
+                                if (!response.isSuccessful) {
+                                    commandSource.sendMessage(CloudCommandMessages().serverUpdateFail)
+                                    return@CommandExecutor
+                                }
+
+                                commandSource.sendMessage(CloudCommandMessages().serverUpdateSuccess)
+                            }
+                        })
+                    }
+                }
+            }
+        }
     }
 }

@@ -62,7 +62,7 @@ class WebAPI {
                             )
                         )
 
-                        ServerManager().addServer(name.toString(), ip.toString(), port.toInt())
+                        ServerManager().registerServer(name.toString(), ip.toString(), port.toInt())
 
                         call.respond(HttpStatusCode.OK)
                         call.respond(HttpStatusCode.NoContent)
@@ -85,7 +85,7 @@ class WebAPI {
                         val ip = call.request.queryParameters["ip"]
                         val port = call.request.queryParameters["port"]
 
-                        ServerManager().addServer(name.toString(), ip.toString(), port!!.toInt())
+                        ServerManager().registerServer(name.toString(), ip.toString(), port!!.toInt())
 
                         call.respond(HttpStatusCode.OK)
                         call.respond(HttpStatusCode.NoContent)
@@ -110,7 +110,7 @@ class WebAPI {
                             name.toString(),
                         )
 
-                        ServerManager().removeServer(name.toString())
+                        ServerManager().unregisterServer(name.toString())
 
                         call.respond(HttpStatusCode.OK)
                         call.respond(HttpStatusCode.NoContent)
@@ -131,7 +131,7 @@ class WebAPI {
 
                         val name = call.request.queryParameters["name"]
 
-                        ServerManager().removeServer(name.toString())
+                        ServerManager().unregisterServer(name.toString())
 
                         call.respond(HttpStatusCode.OK)
                         call.respond(HttpStatusCode.NoContent)

@@ -14,10 +14,12 @@ object ConfigManager {
             mainserver = "",
             api = APIData(
                 applyToOtherServerURL = "",
-                productionFileName = "",
-                productionPath = "",
+                APIPort = 0,
                 apiToken = "",
-                productionURL = ""
+                baseDaemonAPIURL = "",
+                copyToProductionURL = "",
+                zipDevPackURL = "",
+                zipMainPackURL = ""
             ),
             defaultRPId = "",
             mainPack = "",

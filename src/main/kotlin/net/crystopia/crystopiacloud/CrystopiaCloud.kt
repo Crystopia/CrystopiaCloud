@@ -2,10 +2,11 @@ package net.crystopia.crystopiacloud
 
 import com.google.inject.Inject
 import com.velocitypowered.api.event.Subscribe
-import com.velocitypowered.api.event.connection.LoginEvent
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent
 import com.velocitypowered.api.plugin.Plugin
 import com.velocitypowered.api.proxy.ProxyServer
+import dev.jorel.commandapi.CommandAPI
+import dev.jorel.commandapi.CommandAPIVelocityConfig
 import net.crystopia.crystopiacloud.commands.CloudCommand
 import net.crystopia.crystopiacloud.commands.ResourcePackCommand
 import net.crystopia.crystopiacloud.config.ConfigManager
@@ -36,19 +37,18 @@ class CrystopiaCloud {
         this.server = server
         this.logger = logger
 
+        CommandAPI.onLoad(CommandAPIVelocityConfig(server, this))
+
         logger.info("Loaded CrystopiaCloud")
     }
 
     @Subscribe
     fun onProxyInitialization(event: ProxyInitializeEvent?) {
-        server!!.commandManager.register(
-            "cloud", CloudCommand(
-                proxy = server!!
-            )
-        )
-        server!!.commandManager.register(
-            "resourcepack", ResourcePackCommand()
-        )
+        CommandAPI.onEnable();
+
+        CloudCommand()
+        ResourcePackCommand()
+
         server!!.eventManager.register(this, JoinEvent());
         server!!.eventManager.register(this, ResourcePackEvent());
 

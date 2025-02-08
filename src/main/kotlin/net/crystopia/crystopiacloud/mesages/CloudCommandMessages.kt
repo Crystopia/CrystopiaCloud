@@ -18,12 +18,12 @@ class CloudCommandMessages {
     val serverUnregisterFailure =
         mm.deserialize("<color:#ffb6ab>An error has occurred! The server has not been unregistered.</color>")
     val serverCreateRegisterError =
-        mm.deserialize("<color:#9effa9>This server could not be registered in the cloud. Change the name!</color>")
+        mm.deserialize("<color:#ffb6ab>This server could not be registered in the cloud. Change the name!</color>")
     val serverCreateAPIError =
         mm.deserialize("<color:#ffa1b5>There was an error during the creation on the server! Please try again.</color>")
 
     fun serverCreateSuccess(name: String) =
-        mm.deserialize("<color:#b0ffc4>The server has been created and started! Use <gray><click:suggest_command:'/server ${name}'>/server ${name}</click></gray> to join the server!</color>")
+        mm.deserialize("<color:#b0ffc4>The server has been created and started! Use <gray><click:suggest_command:'/server ${name}'><hover:show_text:'<gray>Click to suggest Command</gray>'>/server ${name}</hover></click></gray> to join the server!</color>")
 
     val serverStartFail =
         mm.deserialize("<color:#ffa8b5>When starting the server, something went wrong with the connection.</color>")
@@ -41,4 +41,9 @@ class CloudCommandMessages {
     val serverUpdateFail =
         mm.deserialize("<color:#ffa3a5>The server could not be updated because an error occurred!</color>")
     val serverUpdateSuccess = mm.deserialize("<color:#b0ffb0>The server has been updated and restarted.</color>")
+    val serverAddSuccess = mm.deserialize("<color:#bfffd0>The server has been added to the cloud! </color>")
+    val serverAddFail = mm.deserialize("<color:#ff9587>The server could not be added</color>")
+val serverRemoveSuccess = mm.deserialize("<color:#bfffd0>The server was successfully removed</color>")
+    val serverRemoveFail = mm.deserialize("<color:#ff9587>The server was not found. Or an error has occurred!</color>")
+
 }

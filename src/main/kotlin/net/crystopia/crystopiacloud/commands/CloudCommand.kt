@@ -261,7 +261,10 @@ class CloudCommand {
                                 return@CommandExecutor
                             }
 
+                            ServerManager().unregisterServer(name)
                             ConfigManager.settings.servers.remove(name)
+                            ConfigManager.save()
+
                             commandSource.sendMessage(CloudCommandMessages().serverDeleteSuccess)
                         }
                     })
@@ -313,6 +316,51 @@ class CloudCommand {
                         })
                     }
                 }
+            }
+        }
+        literalArgument("add") {
+            stringArgument("name") {
+                textArgument("host") {
+                    integerArgument("port") {
+                        executes(CommandExecutor { commandSource, commandArguments ->
+
+                            val name = commandArguments[0].toString()
+                            val host = commandArguments[1].toString()
+                            var port = commandArguments[2].toString().toInt()
+
+
+                            val request = ServerManager().addServer(name, host, port)
+
+                            if (request == false) {
+
+                                commandSource.sendMessage(CloudCommandMessages().serverAddFail)
+
+                            } else {
+                                commandSource.sendMessage(CloudCommandMessages().serverAddSuccess)
+                            }
+
+                        })
+                    }
+                }
+            }
+        }
+        literalArgument("remove") {
+            stringArgument("name") {
+                executes(CommandExecutor { commandSource, commandArguments ->
+
+                    val name = commandArguments[0].toString()
+
+                    val request = ServerManager().removeServer(name)
+
+                    if (request == false) {
+
+                        commandSource.sendMessage(CloudCommandMessages().serverRemoveFail)
+
+                    } else {
+                        commandSource.sendMessage(CloudCommandMessages().serverRemoveSuccess)
+                    }
+
+                })
             }
         }
     }

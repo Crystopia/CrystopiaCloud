@@ -3,7 +3,6 @@ package net.crystopia.crystopiacloud.functions
 import net.crystopia.crystopiacloud.config.ConfigManager
 import okhttp3.Headers
 import okhttp3.OkHttpClient
-import java.io.IOException
 
 fun getProductionResourcepack(url: String): Boolean {
 
@@ -13,16 +12,13 @@ fun getProductionResourcepack(url: String): Boolean {
 
     val request = okhttp3.Request.Builder().url(url).get().headers(header).build()
 
-    try {
-        client.newCall(request).execute().use { response ->
-            if (!response.isSuccessful) throw IOException("Unexpected code $response")
 
-            return true
-        }
-    } catch (e: IOException) {
-        e.printStackTrace()
-        return false
+    client.newCall(request).execute().use { response ->
+        if (!response.isSuccessful) return false
+
+        return true
     }
+
 }
 
 fun applyToOtherServer(url: String): Boolean {
@@ -33,16 +29,13 @@ fun applyToOtherServer(url: String): Boolean {
 
     val request = okhttp3.Request.Builder().url(url).get().headers(header).build()
 
-    try {
-        client.newCall(request).execute().use { response ->
-            if (!response.isSuccessful) throw IOException("Unexpected code $response")
 
-            return true
-        }
-    } catch (e: IOException) {
-        e.printStackTrace()
-        return false
+    client.newCall(request).execute().use { response ->
+        if (!response.isSuccessful) return false
+
+        return true
     }
+
 }
 
 
@@ -54,14 +47,10 @@ fun zipResourcepack(url: String): Boolean {
 
     val request = okhttp3.Request.Builder().url(url).get().headers(header).build()
 
-    try {
-        client.newCall(request).execute().use { response ->
-            if (!response.isSuccessful) throw IOException("Unexpected code $response")
+    client.newCall(request).execute().use { response ->
+        if (!response.isSuccessful) return false
 
-            return true
-        }
-    } catch (e: IOException) {
-        e.printStackTrace()
-        return false
+        return true
     }
+
 }

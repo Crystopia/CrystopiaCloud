@@ -1,12 +1,12 @@
 package net.crystopia.crystopiacloud.mesages
 
+import net.crystopia.crystopiacloud.config.data.ServerData
 import net.kyori.adventure.text.minimessage.MiniMessage
 
 class CloudCommandMessages {
     private val mm = MiniMessage.miniMessage()
 
-    val defaultCloudCommand =
-        mm.deserialize("<gray>Use /cloud <option></gray>")
+    val defaultCloudCommand = mm.deserialize("<gray>Use /cloud <option></gray>")
     val addServerFailure = mm.deserialize("<color:#ff858b>Failed to add the Server please try again</color>")
     fun addServerSuccess(name: String) =
         mm.deserialize("<color:#94ffa4>Added server successfully to the list! ($name)</color>")
@@ -43,7 +43,15 @@ class CloudCommandMessages {
     val serverUpdateSuccess = mm.deserialize("<color:#b0ffb0>The server has been updated and restarted.</color>")
     val serverAddSuccess = mm.deserialize("<color:#bfffd0>The server has been added to the cloud! </color>")
     val serverAddFail = mm.deserialize("<color:#ff9587>The server could not be added</color>")
-val serverRemoveSuccess = mm.deserialize("<color:#bfffd0>The server was successfully removed</color>")
+    val serverRemoveSuccess = mm.deserialize("<color:#bfffd0>The server was successfully removed</color>")
     val serverRemoveFail = mm.deserialize("<color:#ff9587>The server was not found. Or an error has occurred!</color>")
+    fun cloudServerList(serverList: ServerData) =
+        mm.deserialize("<b><color:#a3edff>Cloud Server</color></b>\n\n<hover:show_text:'Click to Suggest'><click:suggest_command:'/server ${serverList.name}'><gray> <color:#f0ffa6>${serverList.name}</color> <st>-</st> ${serverList.ip}:${serverList.port} </gray></click></hover>")
 
+    val serverDisabledSuccess =
+        mm.deserialize("<color:#87ffa9>Server has been deactivated and is no longer registered.</color>")
+    val serverDisabledFail = mm.deserialize("<color:#ffb0c2>The server could not be deactivated.</color>")
+    val serverEnabledSuccess =
+        mm.deserialize("<color:#87ffa9>Server has been enabled and is will be registered.</color>")
+    val serverEnableddFail = mm.deserialize("<color:#ffb0c2>The server could not be enabled.</color>")
 }

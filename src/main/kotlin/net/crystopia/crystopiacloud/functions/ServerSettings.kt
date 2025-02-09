@@ -12,7 +12,7 @@ fun renameServer(serverName: String, newName: String): Boolean {
 
     val registeredServer = proxy.getServer(serverName)
     if (registeredServer.isEmpty) {
-        println("Server $serverName existiert nicht.")
+        println("Server $serverName has not been registered!")
         return false
     }
 
@@ -26,7 +26,7 @@ fun renameServer(serverName: String, newName: String): Boolean {
     val serverInfo = ServerInfo(newName, InetSocketAddress(server.ip, server.port))
     proxy.registerServer(serverInfo)
 
-    println("Server $serverName wurde in $newName umbenannt.")
+    println("Server renamed: $serverName")
     return true
 }
 
@@ -35,7 +35,7 @@ fun editServer(serverName: String, ip: String?, port: Int?): Boolean {
 
     val registeredServer = proxy.getServer(serverName)
     if (registeredServer.isEmpty) {
-        println("Server $serverName existiert nicht.")
+        println("Server $serverName doesn't exist.")
         return false
     }
 
@@ -50,7 +50,7 @@ fun editServer(serverName: String, ip: String?, port: Int?): Boolean {
     val serverInfo = ServerInfo(serverName, InetSocketAddress(server.ip, server.port))
     proxy.registerServer(serverInfo)
 
-    println("Server $serverName wurde aktualisiert.")
+    println("Server $serverName has been edited.")
     return true
 }
 
@@ -59,7 +59,7 @@ fun disableServer(serverName: String): Boolean {
 
     val registeredServer = proxy.getServer(serverName)
     if (registeredServer.isEmpty) {
-        println("Server $serverName existiert nicht.")
+        println("Server $serverName is already disabled.")
         return false
     }
 
@@ -69,7 +69,7 @@ fun disableServer(serverName: String): Boolean {
     server.enabled = false
     ConfigManager.save()
 
-    println("Server $serverName wurde deaktiviert.")
+    println("Server $serverName disabled.")
     return true
 }
 
@@ -77,7 +77,7 @@ fun enableServer(serverName: String): Boolean {
     val proxy: ProxyServer = CrystopiaCloud.instance.server!!
 
     if (proxy.getServer(serverName).isPresent) {
-        println("Server $serverName ist bereits aktiv.")
+        println("Server $serverName is already enabled.")
         return false
     }
 
@@ -88,6 +88,6 @@ fun enableServer(serverName: String): Boolean {
     val serverInfo = ServerInfo(serverName, InetSocketAddress(server.ip, server.port))
     proxy.registerServer(serverInfo)
 
-    println("Server $serverName wurde aktiviert.")
+    println("Server $serverName enabled.")
     return true
 }

@@ -1,7 +1,7 @@
 {
   "id": "crystopiacloud",
   "name": "CrystopiaCloud",
-  "version": "1.21",
+  "version": "1.0.0",
   "description": "Our Cloud Plugin to manage our Server",
   "authors": [
     "jesforge"

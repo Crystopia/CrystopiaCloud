@@ -8,7 +8,9 @@ import com.velocitypowered.api.proxy.ProxyServer
 import dev.jorel.commandapi.CommandAPI
 import dev.jorel.commandapi.CommandAPIVelocityConfig
 import net.crystopia.crystopiacloud.commands.CloudCommand
+import net.crystopia.crystopiacloud.commands.LobbyCommand
 import net.crystopia.crystopiacloud.commands.ResourcePackCommand
+import net.crystopia.crystopiacloud.commands.messages.*
 import net.crystopia.crystopiacloud.config.ConfigManager
 import net.crystopia.crystopiacloud.events.JoinEvent
 import net.crystopia.crystopiacloud.events.ResourcePackEvent
@@ -17,7 +19,7 @@ import net.crystopia.crystopiacloud.webapi.WebAPI
 import org.slf4j.Logger
 
 
-@Plugin(id = "crystopiacloud", name = "CrystopiaCloud", version = "0.1.0", authors = ["jesforge"])
+@Plugin(id = "crystopiacloud", name = "CrystopiaCloud", version = "1.0.0", authors = ["jesforge"])
 
 class CrystopiaCloud {
 
@@ -48,6 +50,15 @@ class CrystopiaCloud {
 
         CloudCommand()
         ResourcePackCommand()
+        LobbyCommand()
+
+        // Message Commands
+        VoteCommand()
+        StoreCommand()
+        HelpCommand()
+        GuidesCommand()
+        BugCommand()
+        DiscordCommand()
 
         server!!.eventManager.register(this, JoinEvent());
         server!!.eventManager.register(this, ResourcePackEvent());

@@ -1,13 +1,13 @@
 package net.crystopia.crystopiacloud.commands
 
-import dev.jorel.commandapi.CommandTree
+import dev.jorel.commandapi.arguments.ArgumentSuggestions
 import dev.jorel.commandapi.executors.CommandExecutor
 import dev.jorel.commandapi.kotlindsl.*
 import net.crystopia.crystopiacloud.config.ConfigManager
-import net.crystopia.crystopiacloud.config.data.ServerData
 import net.crystopia.crystopiacloud.functions.ServerManager
+import net.crystopia.crystopiacloud.functions.disableServer
+import net.crystopia.crystopiacloud.functions.enableServer
 import net.crystopia.crystopiacloud.mesages.CloudCommandMessages
-import net.kyori.adventure.text.Component
 import okhttp3.Headers
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.OkHttpClient
@@ -23,6 +23,9 @@ class CloudCommand {
         })
         literalArgument("register") {
             stringArgument("name") {
+                replaceSuggestions(ArgumentSuggestions.strings {
+                    ConfigManager.settings.servers.keys.toTypedArray()
+                })
                 executes(CommandExecutor { commandSource, commandArguments ->
 
                     val name = commandArguments[0].toString()
@@ -41,6 +44,9 @@ class CloudCommand {
         }
         literalArgument("unregister") {
             stringArgument("name") {
+                replaceSuggestions(ArgumentSuggestions.strings {
+                    ConfigManager.settings.servers.keys.toTypedArray()
+                })
                 executes(CommandExecutor { commandSource, commandArguments ->
 
                     val name = commandArguments[0].toString()
@@ -114,7 +120,9 @@ class CloudCommand {
         }
         literalArgument("start") {
             stringArgument("name") {
-
+                replaceSuggestions(ArgumentSuggestions.strings {
+                    ConfigManager.settings.servers.keys.toTypedArray()
+                })
                 executes(CommandExecutor { commandSource, commandArguments ->
 
                     val name = commandArguments[0].toString()
@@ -149,7 +157,9 @@ class CloudCommand {
         }
         literalArgument("stop") {
             stringArgument("name") {
-
+                replaceSuggestions(ArgumentSuggestions.strings {
+                    ConfigManager.settings.servers.keys.toTypedArray()
+                })
                 executes(CommandExecutor { commandSource, commandArguments ->
 
                     val name = commandArguments[0].toString()
@@ -184,7 +194,9 @@ class CloudCommand {
         }
         literalArgument("restart") {
             stringArgument("name") {
-
+                replaceSuggestions(ArgumentSuggestions.strings {
+                    ConfigManager.settings.servers.keys.toTypedArray()
+                })
                 executes(CommandExecutor { commandSource, commandArguments ->
 
                     val name = commandArguments[0].toString()
@@ -231,6 +243,9 @@ class CloudCommand {
         }
         literalArgument("delete") {
             stringArgument("name") {
+                replaceSuggestions(ArgumentSuggestions.strings {
+                    ConfigManager.settings.servers.keys.toTypedArray()
+                })
                 stringArgument("delete? - type Force", optional = true) {
                     executes(CommandExecutor { commandSource, commandArguments ->
 
@@ -273,6 +288,9 @@ class CloudCommand {
         }
         literalArgument("update") {
             stringArgument("name") {
+                replaceSuggestions(ArgumentSuggestions.strings {
+                    ConfigManager.settings.servers.keys.toTypedArray()
+                })
                 textArgument("serverOptions") {
                     integerArgument("port", optional = true) {
                         executes(CommandExecutor { commandSource, commandArguments ->
@@ -362,6 +380,45 @@ class CloudCommand {
 
                 })
             }
+        }
+        literalArgument("enable") {
+            stringArgument("name") {
+                replaceSuggestions(ArgumentSuggestions.strings {
+                    ConfigManager.settings.servers.keys.toTypedArray()
+                })
+                executes(CommandExecutor { commandSource, commandArguments ->
+                    val req = enableServer(commandArguments[0].toString())
+
+                    if (req == false) {
+                        commandSource.sendMessage(CloudCommandMessages().serverEnableddFail)
+                    } else {
+                        commandSource.sendMessage(CloudCommandMessages().serverEnabledSuccess)
+                    }
+                })
+            }
+        }
+        literalArgument("disable") {
+            stringArgument("name") {
+                replaceSuggestions(ArgumentSuggestions.strings {
+                    ConfigManager.settings.servers.keys.toTypedArray()
+                })
+                executes(CommandExecutor { commandSource, commandArguments ->
+                    val req = disableServer(commandArguments[0].toString())
+
+                    if (req == false) {
+                        commandSource.sendMessage(CloudCommandMessages().serverEnableddFail)
+                    } else {
+                        commandSource.sendMessage(CloudCommandMessages().serverEnabledSuccess)
+                    }
+                })
+            }
+        }
+        literalArgument("list") {
+            executes(CommandExecutor { commandSource, commandArguments ->
+                ConfigManager.settings.servers.forEach { (_, server) ->
+                    commandSource.sendMessage(CloudCommandMessages().cloudServerList(serverList = server))
+                }
+            })
         }
     }
 }

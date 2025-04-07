@@ -50,12 +50,12 @@ tasks {
     }
     compileJava {
         options.encoding = "UTF-8"
-        options.release.set(17)
+        options.release.set(21)
     }
     compileKotlin {
-        kotlinOptions.jvmTarget = "17"
+        kotlinOptions.jvmTarget = "21"
     }
 }
 kotlin {
-    jvmToolchain(17)
+    jvmToolchain(21)
 }
